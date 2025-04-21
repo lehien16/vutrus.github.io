@@ -145,6 +145,26 @@
     </div>
   </div>
 
+  <!-- Cấu hình Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBtO7yMF8yhTkTv3faN0u1oNyJ0KpaBnsA",
+      authDomain: "vu-tru-nghe-nghiep.firebaseapp.com",
+      databaseURL: "https://vu-tru-nghe-nghiep-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "vu-tru-nghe-nghiep",
+      storageBucket: "vu-tru-nghe-nghiep.firebasestorage.app",
+      messagingSenderId: "248626863436",
+      appId: "1:248626863436:web:00362f550042ef8dd743e9",
+      measurementId: "G-3QDN201BBD"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database(app);
+  </script>
+
   <script>
     const universe = document.getElementById('universe');
     const stats = document.getElementById('stats');
@@ -164,18 +184,14 @@
       const career = binaryToText(binaryInput); // Hàm chuyển nhị phân thành văn bản
     
       try {
-        await fetch('https://script.google.com/macros/s/AKfycbw1xN9VOlNTqr8WwC6dzCqV6nmJibm3yhftUAJLqbjb2RpgbKqfcPBBNhmFv0f4mmMY1g/exec', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            binary: binaryInput,
-            career: career
-          }),
+        // Lưu vào Firebase Realtime Database
+        const ref = database.ref('career_stars');
+        await ref.push({
+          binary: binaryInput,
+          career: career
         });
       } catch (error) {
-        console.error('Lỗi khi gửi dữ liệu lên Google Apps Script', error);
+        console.error('Lỗi khi gửi dữ liệu lên Firebase', error);
       }
     
       document.getElementById('binaryInput').value = '';
@@ -235,14 +251,16 @@
     // Tạo các ngôi sao nền
     generateStars(150);
 
-    // Tải dữ liệu từ Google Sheets và hiển thị các ngôi sao
+    // Tải dữ liệu từ Firebase và hiển thị các ngôi sao
     window.onload = async function () {
       try {
-        const response = await fetch('https://script.google.com/macros/s/AKfycbw1xN9VOlNTqr8WwC6dzCqV6nmJibm3yhftUAJLqbjb2RpgbKqfcPBBNhmFv0f4mmMY1g/exec');
-        const data = await response.json();
+        const ref = database.ref('career_stars');
+        const snapshot = await ref.once('value');
+        const data = snapshot.val();
         
         // Duyệt qua từng item để hiển thị ngôi sao trên vũ trụ và cập nhật thống kê
-        for (const item of data) {
+        for (const key in data) {
+          const item = data[key];
           if (item.binary && item.career) {
             renderStar(item.binary, item.career);
             if (!careerCount[item.career]) careerCount[item.career] = 0;
@@ -253,7 +271,7 @@
         // Cập nhật thống kê nghề nghiệp
         updateStats();
       } catch (error) {
-        console.error('Lỗi khi tải dữ liệu từ Google Apps Script', error);
+        console.error('Lỗi khi tải dữ liệu từ Firebase', error);
       }
     };
   </script>
