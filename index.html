@@ -160,23 +160,24 @@
     async function addStar() {
       const binaryInput = document.getElementById('binaryInput').value.trim();
       if (!binaryInput) return;
-
-      const career = binaryToText(binaryInput);
-      renderStar(binaryInput, career);
-
-      // Gửi dữ liệu nghề nghiệp lên Google Apps Script
+    
+      const career = binaryToText(binaryInput); // Hàm chuyển nhị phân thành văn bản
+    
       try {
         await fetch('https://script.google.com/macros/s/AKfycbw1xN9VOlNTqr8WwC6dzCqV6nmJibm3yhftUAJLqbjb2RpgbKqfcPBBNhmFv0f4mmMY1g/exec', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({ binary: binaryInput, career: career, timespace: timespace }),
+          body: JSON.stringify({
+            binary: binaryInput,
+            career: career
+          }),
         });
       } catch (error) {
         console.error('Lỗi khi gửi dữ liệu lên Google Apps Script', error);
       }
-
+    
       document.getElementById('binaryInput').value = '';
     }
 
