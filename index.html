@@ -2,39 +2,75 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Vũ trụ nghề nghiệp nhị phân</title>
   <style>
+    * {
+      box-sizing: border-box;
+    }
     body {
+      margin: 0;
       font-family: 'Segoe UI', sans-serif;
       background: radial-gradient(circle at center, #000010, #000);
       color: #fff;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      height: 100vh;
       display: flex;
-      justify-content: center;
-      align-items: center;
       flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      min-height: 100vh;
+      padding: 20px;
+      overflow-x: hidden;
     }
+
+    h1 {
+      margin-bottom: 10px;
+    }
+
     .container {
       display: flex;
-      justify-content: space-between;
+      flex-direction: row;
+      justify-content: center;
+      align-items: flex-start;
+      margin-top: 20px;
       width: 100%;
       max-width: 1300px;
-      height: 80vh;
     }
+
     .input-and-stats {
-      width: 300px;
-      margin-right: 20px;
+      width: 320px;
+      margin-right: 30px;
     }
+
+    .input-group {
+      margin-bottom: 20px;
+    }
+
+    .input-group input {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      border-radius: 6px;
+      border: none;
+    }
+
+    .input-group button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background: #1e90ff;
+      border: none;
+      border-radius: 6px;
+      color: white;
+      cursor: pointer;
+    }
+
     .universe-container {
       flex-grow: 1;
       position: relative;
-      height: 100%;
-      margin-top: 40px;
+      height: 600px;
+      background: transparent;
     }
+
     #center-star {
       position: absolute;
       width: 120px;
@@ -50,7 +86,9 @@
       justify-content: center;
       font-weight: bold;
       font-size: 14px;
+      z-index: 2;
     }
+
     .orbit-path {
       position: absolute;
       width: 400px;
@@ -60,7 +98,9 @@
       left: 50%;
       top: 50%;
       transform: translate(-50%, -50%);
+      z-index: 1;
     }
+
     .orbit-star {
       position: absolute;
       width: 100px;
@@ -75,18 +115,21 @@
       font-size: 11px;
       animation: orbit 20s linear infinite;
     }
+
     @keyframes orbit {
       0% { transform: rotate(0deg) translateX(200px) rotate(0deg); }
       100% { transform: rotate(360deg) translateX(200px) rotate(-360deg); }
     }
+
     .starfield {
       position: absolute;
       width: 100%;
       height: 100%;
       top: 0;
       left: 0;
-      z-index: -1;
+      z-index: 0;
     }
+
     .star {
       position: absolute;
       width: 2px;
@@ -95,46 +138,34 @@
       border-radius: 50%;
       opacity: 0.8;
     }
-    .input-group {
-      margin: 20px 0;
-    }
-    .input-group input, .input-group button {
-      padding: 10px;
-      font-size: 16px;
-    }
+
     #stats {
-      margin-top: 30px;
-      text-align: left;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
       background-color: rgba(255,255,255,0.05);
-      padding: 15px;
+      padding: 10px;
       border-radius: 10px;
-      font-size: 16px;
+      font-size: 15px;
       max-height: 400px;
       overflow-y: auto;
     }
+
     #stats ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    #stats li {
-      margin: 5px 0;
+      padding-left: 20px;
+      text-align: left;
     }
   </style>
 </head>
 <body>
-  <h1>Vũ trụ Nghề Nghiệp Nhị Phân 🌌</h1>
-  <p>Hãy nhập <strong>nghề nghiệp mơ ước</strong> đã được mã hóa bằng <strong>hệ nhị phân</strong> (mã ASCII).</p>
+  <h1>🌌 Vũ trụ Nghề Nghiệp Nhị Phân</h1>
+  <p>Nhập <strong>mã nhị phân nghề nghiệp</strong> (mã ASCII) để gửi vào vũ trụ ✨</p>
+
   <div class="container">
     <div class="input-and-stats">
       <div class="input-group">
-        <input type="text" id="binaryInput" placeholder="Nhập mã nhị phân (cách nhau bằng dấu cách)">
+        <input type="text" id="binaryInput" placeholder="01000011 01001111 01000100 01000101">
         <button onclick="addStar()">🚀 Gửi vào vũ trụ</button>
       </div>
-      <h2>📊 Thống kê nghề nghiệp</h2>
-      <div id="stats"></div>
+      <h3>📊 Thống kê</h3>
+      <div id="stats">Chưa có dữ liệu...</div>
     </div>
 
     <div class="universe-container">
@@ -149,14 +180,11 @@
     const universe = document.getElementById('universe');
     const stats = document.getElementById('stats');
     const careerCount = {};
-    let orbitIndex = 0;
 
-    // Chuyển mã nhị phân thành văn bản
     function binaryToText(binary) {
       return binary.trim().split(' ').map(b => String.fromCharCode(parseInt(b, 2))).join('');
     }
 
-    // Hàm thêm ngôi sao vào vũ trụ
     function addStar() {
       const binaryInput = document.getElementById('binaryInput').value.trim();
       if (!binaryInput) return;
@@ -166,7 +194,6 @@
       document.getElementById('binaryInput').value = '';
     }
 
-    // Vẽ ngôi sao quay quanh trung tâm và cập nhật thống kê
     function renderStar(binaryInput, career) {
       const star = document.createElement('div');
       star.className = 'orbit-star';
@@ -187,36 +214,29 @@
       updateStats();
     }
 
-    // Cập nhật bảng thống kê nghề nghiệp
     function updateStats() {
-      let total = 0;
-      for (const count of Object.values(careerCount)) {
-        total += count;
-      }
-
+      const total = Object.values(careerCount).reduce((a, b) => a + b, 0);
       let html = '<ul>';
-      for (const career in careerCount) {
-        const percent = ((careerCount[career] / total) * 100).toFixed(1);
-        html += `<li><strong>${career}</strong>: ${careerCount[career]} lượt (${percent}%)</li>`;
+      for (const [career, count] of Object.entries(careerCount)) {
+        const percent = ((count / total) * 100).toFixed(1);
+        html += `<li><strong>${career}</strong>: ${count} lượt (${percent}%)</li>`;
       }
-      html += `</ul><p><strong>Tổng cộng:</strong> ${total} nghề nghiệp đã được gửi 🚀</p>`;
+      html += `</ul><p><strong>Tổng:</strong> ${total} nghề nghiệp</p>`;
       stats.innerHTML = html;
     }
 
-    // Tạo sao nền lấp lánh
-    function generateStars(num) {
+    function generateStars(n) {
       const starfield = document.getElementById('starfield');
-      for (let i = 0; i < num; i++) {
+      for (let i = 0; i < n; i++) {
         const star = document.createElement('div');
         star.className = 'star';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.left = Math.random() * 100 + '%';
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.left = `${Math.random() * 100}%`;
         starfield.appendChild(star);
       }
     }
 
-    // Gọi khi trang vừa tải xong
-    window.onload = function () {
+    window.onload = () => {
       generateStars(150);
     };
   </script>
