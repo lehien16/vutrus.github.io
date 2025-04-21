@@ -1,279 +1,43 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Vũ trụ nghề nghiệp nhị phân</title>
   <style>
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: radial-gradient(circle at center, #000010, #000);
-      color: #fff;
-      text-align: center;
-      padding: 20px;
-      margin: 0;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-    }
-    .container {
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      max-width: 1300px;
-      height: 80vh;
-    }
-    .input-and-stats {
-      width: 300px;
-      margin-right: 20px;
-    }
-    .universe-container {
-      flex-grow: 1;
+    /* Đơn giản hóa CSS cho vũ trụ */
+    #universe {
       position: relative;
-      height: 100%;
-      margin-top: 40px;
-    }
-    #center-star {
-      position: absolute;
-      width: 120px;
-      height: 120px;
-      background: gold;
-      border-radius: 50%;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-      box-shadow: 0 0 30px gold;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
-    }
-    .orbit-path {
-      position: absolute;
-      width: 400px;
-      height: 400px;
-      border: 1px dashed rgba(255,255,255,0.2);
-      border-radius: 50%;
-      left: 50%;
-      top: 50%;
-      transform: translate(-50%, -50%);
-    }
-    .orbit-star {
-      position: absolute;
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      background: #1e90ff;
-      box-shadow: 0 0 10px #1e90ff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      font-size: 11px;
-      animation: orbit 20s linear infinite;
-    }
-    @keyframes orbit {
-      0% { transform: rotate(0deg) translateX(200px) rotate(0deg); }
-      100% { transform: rotate(360deg) translateX(200px) rotate(-360deg); }
-    }
-    .starfield {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      top: 0;
-      left: 0;
-      z-index: -1;
+      height: 500px;
+      background: #000;
+      border: 1px solid #fff;
+      overflow: hidden;
     }
     .star {
       position: absolute;
-      width: 2px;
-      height: 2px;
-      background: white;
-      border-radius: 50%;
-      opacity: 0.8;
-    }
-    .input-group {
-      margin: 20px 0;
-    }
-    .input-group input, .input-group button {
-      padding: 10px;
-      font-size: 16px;
+      color: #fff;
+      font-size: 12px;
+      font-family: Arial, sans-serif;
+      text-align: center;
     }
     #stats {
-      margin-top: 30px;
-      text-align: left;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
-      background-color: rgba(255,255,255,0.05);
-      padding: 15px;
-      border-radius: 10px;
-      font-size: 16px;
-      max-height: 400px;
-      overflow-y: auto;
-    }
-    #stats ul {
-      list-style: none;
-      padding-left: 0;
-    }
-    #stats li {
-      margin: 5px 0;
+      margin-top: 20px;
+      color: #fff;
     }
   </style>
 </head>
 <body>
-  <h1>Vũ trụ Nghề Nghiệp Nhị Phân 🌌</h1>
-  <p>Hãy nhập <strong>nghề nghiệp mơ ước</strong> đã được mã hóa bằng <strong>hệ nhị phân</strong> (mã ASCII).</p>
-  <div class="container">
-    <div class="input-and-stats">
-      <div class="input-group">
-        <input type="text" id="binaryInput" placeholder="Nhập mã nhị phân (cách nhau bằng dấu cách)">
-        <button onclick="addStar()">🚀 Gửi vào vũ trụ</button>
-      </div>
-      <h2>📊 Thống kê nghề nghiệp</h2>
-      <div id="stats"></div>
-    </div>
+  <h1>Vũ trụ nghề nghiệp nhị phân</h1>
+  <div id="universe"></div>
+  <br />
+  <input type="text" id="binaryInput" placeholder="Nhập dãy nhị phân" />
+  <button onclick="addStar()">Thêm ngôi sao</button>
+  <div id="stats"></div>
 
-    <div class="universe-container">
-      <div class="starfield" id="starfield"></div>
-      <div id="center-star">🌞<br>Trung tâm</div>
-      <div class="orbit-path"></div>
-      <div id="universe"></div>
-    </div>
-  </div>
-
-  <!-- Cấu hình Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.1.2/firebase-database.js"></script>
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyBtO7yMF8yhTkTv3faN0u1oNyJ0KpaBnsA",
-      authDomain: "vu-tru-nghe-nghiep.firebaseapp.com",
-      databaseURL: "https://vu-tru-nghe-nghiep-default-rtdb.asia-southeast1.firebasedatabase.app",
-      projectId: "vu-tru-nghe-nghiep",
-      storageBucket: "vu-tru-nghe-nghiep.firebasestorage.app",
-      messagingSenderId: "248626863436",
-      appId: "1:248626863436:web:00362f550042ef8dd743e9",
-      measurementId: "G-3QDN201BBD"
-    };
-
-    // Initialize Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const database = firebase.database(app);
-  </script>
-
-  <script>
-    const universe = document.getElementById('universe');
-    const stats = document.getElementById('stats');
-    const careerCount = {};
-    let orbitIndex = 0;
-
-    // Chuyển đổi mã nhị phân sang văn bản (ASCII)
-    function binaryToText(binary) {
-      return binary.trim().split(' ').map(b => String.fromCharCode(parseInt(b, 2))).join('');
-    }
-
-    // Hàm thêm ngôi sao mới vào vũ trụ
-    async function addStar() {
-      const binaryInput = document.getElementById('binaryInput').value.trim();
-      if (!binaryInput) return;
-    
-      const career = binaryToText(binaryInput); // Hàm chuyển nhị phân thành văn bản
-    
-      try {
-        // Lưu vào Firebase Realtime Database
-        const ref = database.ref('career_stars');
-        await ref.push({
-          binary: binaryInput,
-          career: career
-        });
-      } catch (error) {
-        console.error('Lỗi khi gửi dữ liệu lên Firebase', error);
-      }
-    
-      document.getElementById('binaryInput').value = '';
-    }
-
-    // Hàm render ngôi sao và cập nhật thống kê
-    function renderStar(binaryInput, career) {
-      const star = document.createElement('div');
-      star.className = 'orbit-star';
-      star.innerHTML = `<strong>${career}</strong><br><small>${binaryInput}</small>`;
-
-      const delay = Math.random() * 20;
-      const duration = 15 + Math.random() * 10;
-      star.style.animation = `orbit ${duration}s linear infinite`;
-      star.style.transformOrigin = `0 0`;
-      star.style.animationDelay = `${delay}s`;
-      star.style.left = '50%';
-      star.style.top = '50%';
-
-      universe.appendChild(star);
-      orbitIndex++;
-
-      // Cập nhật số lần xuất hiện của nghề nghiệp
-      if (!careerCount[career]) careerCount[career] = 0;
-      careerCount[career]++;
-      updateStats();
-    }
-
-    // Cập nhật thống kê nghề nghiệp
-    function updateStats() {
-      let total = 0;
-      for (const count of Object.values(careerCount)) {
-        total += count;
-      }
-
-      let html = '<ul>';
-      for (const career in careerCount) {
-        const percent = ((careerCount[career] / total) * 100).toFixed(1);
-        html += `<li><strong>${career}</strong>: ${careerCount[career]} lượt (${percent}%)</li>`;
-      }
-      html += `</ul><p><strong>Tổng cộng:</strong> ${total} nghề nghiệp đã được gửi 🚀</p>`;
-      stats.innerHTML = html;
-    }
-
-    // Hàm tạo các ngôi sao ngẫu nhiên trong không gian
-    function generateStars(num) {
-      const starfield = document.getElementById('starfield');
-      for (let i = 0; i < num; i++) {
-        const star = document.createElement('div');
-        star.className = 'star';
-        star.style.top = Math.random() * 100 + '%';
-        star.style.left = Math.random() * 100 + '%';
-        starfield.appendChild(star);
-      }
-    }
-
-    // Tạo các ngôi sao nền
-    generateStars(150);
-
-    // Tải dữ liệu từ Firebase và hiển thị các ngôi sao
-    window.onload = async function () {
-      try {
-        const ref = database.ref('career_stars');
-        const snapshot = await ref.once('value');
-        const data = snapshot.val();
-        
-        // Duyệt qua từng item để hiển thị ngôi sao trên vũ trụ và cập nhật thống kê
-        for (const key in data) {
-          const item = data[key];
-          if (item.binary && item.career) {
-            renderStar(item.binary, item.career);
-            if (!careerCount[item.career]) careerCount[item.career] = 0;
-            careerCount[item.career]++;
-          }
-        }
-        
-        // Cập nhật thống kê nghề nghiệp
-        updateStats();
-      } catch (error) {
-        console.error('Lỗi khi tải dữ liệu từ Firebase', error);
-      }
-    };
-  </script>
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
+  <!-- Main script -->
+  <script src="main.js"></script>
 </body>
 </html>
