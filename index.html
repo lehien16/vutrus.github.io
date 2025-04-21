@@ -145,64 +145,55 @@
     </div>
   </div>
 
-  <script src="https://apis.google.com/js/api.js"></script>
   <script>
-    let careerCount = {};
-    let orbitIndex = 0;
     const universe = document.getElementById('universe');
     const stats = document.getElementById('stats');
+    const careerCount = {};
+    let orbitIndex = 0;
 
-    // Chuyển đổi nhị phân sang văn bản (ASCII)
+    // Chuyển đổi mã nhị phân sang văn bản (ASCII)
     function binaryToText(binary) {
       return binary.trim().split(' ').map(b => String.fromCharCode(parseInt(b, 2))).join('');
     }
 
-    // Hàm gửi dữ liệu lên Google Sheets
-    function addDataToGoogleSheets(binaryInput, career) {
-      const sheetId = '1P6vcQkwUIDepX5qGA32wK_pmbD3uovOS1BRJ1aoEpwc'; 
-      const range = 'Data!A:C';  // Dải ô để ghi dữ liệu 
-
-      const values = [
-        [new Date().toISOString(), binaryInput, career]  // Dữ liệu cần gửi
-      ];
-
-      const body = {
-        values: values,
-      };
-
-      gapi.client.sheets.spreadsheets.values.append({
-        spreadsheetId: sheetId,
-        range: range,
-        valueInputOption: 'RAW',
-        resource: body,
-      }).then(function(response) {
-        console.log('Dữ liệu đã được ghi vào Google Sheets:', response);
-      });
-    }
-
     // Hàm thêm ngôi sao mới vào vũ trụ
-    function addStar() {
+    async function addStar() {
       const binaryInput = document.getElementById('binaryInput').value.trim();
       if (!binaryInput) return;
     
-      const career = binaryToText(binaryInput);
-      addDataToGoogleSheets(binaryInput, career); // Gửi dữ liệu lên Google Sheets
+      const career = binaryToText(binaryInput); // Hàm chuyển nhị phân thành văn bản
+    
+      try {
+        await fetch('https://script.google.com/macros/s/AKfycbw1xN9VOlNTqr8WwC6dzCqV6nmJibm3yhftUAJLqbjb2RpgbKqfcPBBNhmFv0f4mmMY1g/exec', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            binary: binaryInput,
+            career: career
+          }),
+        });
+      } catch (error) {
+        console.error('Lỗi khi gửi dữ liệu lên Google Apps Script', error);
+      }
     
       document.getElementById('binaryInput').value = '';
-      renderStar(binaryInput, career); // Hiển thị ngôi sao
     }
 
     // Hàm render ngôi sao và cập nhật thống kê
     function renderStar(binaryInput, career) {
       const star = document.createElement('div');
       star.className = 'orbit-star';
-      star.innerHTML = `<strong>${career}</strong><br><small>${binaryInput}</small>`;
+      star.innerHTML = <strong>${career}</strong><br><small>${binaryInput}</small>;
 
       const delay = Math.random() * 20;
       const duration = 15 + Math.random() * 10;
-      star.style.animation = `orbit ${duration}s linear infinite`;
-      star.style.transformOrigin = `0 0`;
-      star.style.animationDelay = `${delay}s`;
+      star.style.animation = orbit ${duration}s linear infinite;
+      star.style.transformOrigin = 0 0;
+      star.style.animationDelay = ${delay}s;
+      star.style.left = '50%';
+      star.style.top = '50%';
 
       universe.appendChild(star);
       orbitIndex++;
@@ -223,31 +214,47 @@
       let html = '<ul>';
       for (const career in careerCount) {
         const percent = ((careerCount[career] / total) * 100).toFixed(1);
-        html += `<li><strong>${career}</strong>: ${careerCount[career]} lượt (${percent}%)</li>`;
+        html += <li><strong>${career}</strong>: ${careerCount[career]} lượt (${percent}%)</li>;
       }
-      html += `</ul><p><strong>Tổng cộng:</strong> ${total} nghề nghiệp đã được gửi 🚀</p>`;
+      html += </ul><p><strong>Tổng cộng:</strong> ${total} nghề nghiệp đã được gửi 🚀</p>;
       stats.innerHTML = html;
     }
 
-    // Hàm khởi tạo Google API
-    function initGoogleSheetsAPI() {
-      gapi.client.init({
-        apiKey: 'AIzaSyCNg63MHnmB1ihFJHlrt9CjvTYmP1l-3B0',
-        clientId: '1063964400447-ivg5l3el0otkfdt439pnd381tuspgqo4.apps.googleusercontent.com',
-        scope: 'https://www.googleapis.com/auth/spreadsheets',
-        discoveryDocs: ['https://sheets.googleapis.com/$discovery/rest?version=v4'],
-      }).then(function () {
-        gapi.auth2.getAuthInstance().signIn();
-      });
+    // Hàm tạo các ngôi sao ngẫu nhiên trong không gian
+    function generateStars(num) {
+      const starfield = document.getElementById('starfield');
+      for (let i = 0; i < num; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.left = Math.random() * 100 + '%';
+        starfield.appendChild(star);
+      }
     }
 
-    // Tải Google API và khởi tạo
-    function handleClientLoad() {
-      gapi.load('client:auth2', initGoogleSheetsAPI);
-    }
+    // Tạo các ngôi sao nền
+    generateStars(150);
 
-    window.onload = function() {
-      handleClientLoad();
+    // Tải dữ liệu từ Google Sheets và hiển thị các ngôi sao
+    window.onload = async function () {
+      try {
+        const response = await fetch('https://script.google.com/macros/s/AKfycbw1xN9VOlNTqr8WwC6dzCqV6nmJibm3yhftUAJLqbjb2RpgbKqfcPBBNhmFv0f4mmMY1g/exec');
+        const data = await response.json();
+        
+        // Duyệt qua từng item để hiển thị ngôi sao trên vũ trụ và cập nhật thống kê
+        for (const item of data) {
+          if (item.binary && item.career) {
+            renderStar(item.binary, item.career);
+            if (!careerCount[item.career]) careerCount[item.career] = 0;
+            careerCount[item.career]++;
+          }
+        }
+        
+        // Cập nhật thống kê nghề nghiệp
+        updateStats();
+      } catch (error) {
+        console.error('Lỗi khi tải dữ liệu từ Google Apps Script', error);
+      }
     };
   </script>
 </body>
